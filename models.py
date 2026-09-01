@@ -160,6 +160,18 @@ class Settings(SettingsBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SiteSettings(BaseModel):
+    """Настройки сайта, агрегирующие ключевые параметры."""
+    site_name: str = "My Site"
+    theme: Theme = Theme()
+    maintenance_mode: bool = False
+    allow_registration: bool = True
+    posts_per_page: int = 10
+    settings: Dict[str, str] = Field(default_factory=dict)
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

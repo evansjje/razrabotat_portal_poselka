@@ -9,6 +9,11 @@ from config import settings
 from database import DB_PATH
 
 
+async def get_weather(db: Optional[aiosqlite.Connection] = None) -> Dict[str, Any]:
+    """Get current weather and forecast for Talakan"""
+    return await get_weather_data(db)
+
+
 async def get_weather_data(db: Optional[aiosqlite.Connection] = None) -> Dict[str, Any]:
     """Get current weather and forecast for Talakan"""
     if db is None:
