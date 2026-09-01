@@ -1,0 +1,83 @@
+<!-- templates/login.html -->
+{% extends "base.html" %}
+
+{% block title %}Вход - {{ theme.app_name or 'Портал поселка Талакан' }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex-grow">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Вход на портал</h1>
+        
+        {% if error %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        {% if success_message %}
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            {{ success_message }}
+        </div>
+        {% endif %}
+
+        <form action="/auth/login" method="post" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="your@email.com"
+                >
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Пароль</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="••••••••"
+                >
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input 
+                        type="checkbox" 
+                        id="remember" 
+                        name="remember" 
+                        class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    >
+                    <label for="remember" class="ml-2 block text-sm text-gray-700">Запомнить меня</label>
+                </div>
+                <a href="#" class="text-sm text-primary hover:underline">Забыли пароль?</a>
+            </div>
+            
+            <button 
+                type="submit" 
+                class="w-full bg-button text-buttonText py-3 px-4 rounded-lg font-semibold hover:opacity-90 transition duration-200"
+            >
+                Войти
+            </button>
+        </form>
+        
+        <div class="mt-6 pt-6 border-t border-gray-200">
+            <p class="text-center text-sm text-gray-600">
+                Нет аккаунта? 
+                <a href="/auth/register" class="text-primary hover:underline font-medium">Зарегистрироваться</a>
+            </p>
+        </div>
+        
+        {% if theme and theme.primary_color %}
+        <div class="mt-6 text-center">
+            <p class="text-xs text-gray-400">Портал поселка Талакан • Бурейская ГЭС</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

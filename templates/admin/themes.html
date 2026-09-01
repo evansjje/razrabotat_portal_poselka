@@ -1,0 +1,248 @@
+<!-- templates/admin/themes.html -->
+{% extends "base.html" %}
+
+{% block title %}Управление темами - {{ theme.app_name or 'Портал поселка Талакан' }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex-grow">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Конструктор тем оформления</h1>
+            <a href="/admin" class="text-primary hover:underline">← Назад в админ-панель</a>
+        </div>
+
+        {% if success_message %}
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            {{ success_message }}
+        </div>
+        {% endif %}
+
+        {% if error_message %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Форма создания/редактирования темы -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Настройка темы</h2>
+                
+                <form action="/admin/themes/save" method="post" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Название темы</label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            value="{{ current_theme.name if current_theme else 'Стандартная' }}"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        >
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="primary_color" class="block text-sm font-medium text-gray-700 mb-2">Основной цвет</label>
+                            <input 
+                                type="color" 
+                                id="primary_color" 
+                                name="primary_color" 
+                                value="{{ current_theme.primary_color if current_theme else '#3B82F6' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="secondary_color" class="block text-sm font-medium text-gray-700 mb-2">Вторичный цвет</label>
+                            <input 
+                                type="color" 
+                                id="secondary_color" 
+                                name="secondary_color" 
+                                value="{{ current_theme.secondary_color if current_theme else '#10B981' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="header_bg" class="block text-sm font-medium text-gray-700 mb-2">Фон шапки</label>
+                            <input 
+                                type="color" 
+                                id="header_bg" 
+                                name="header_bg" 
+                                value="{{ current_theme.header_bg if current_theme else '#1F2937' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="header_text" class="block text-sm font-medium text-gray-700 mb-2">Текст шапки</label>
+                            <input 
+                                type="color" 
+                                id="header_text" 
+                                name="header_text" 
+                                value="{{ current_theme.header_text if current_theme else '#FFFFFF' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="button_bg" class="block text-sm font-medium text-gray-700 mb-2">Фон кнопок</label>
+                            <input 
+                                type="color" 
+                                id="button_bg" 
+                                name="button_bg" 
+                                value="{{ current_theme.button_bg if current_theme else '#3B82F6' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="button_text" class="block text-sm font-medium text-gray-700 mb-2">Текст кнопок</label>
+                            <input 
+                                type="color" 
+                                id="button_text" 
+                                name="button_text" 
+                                value="{{ current_theme.button_text if current_theme else '#FFFFFF' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="footer_bg" class="block text-sm font-medium text-gray-700 mb-2">Фон подвала</label>
+                            <input 
+                                type="color" 
+                                id="footer_bg" 
+                                name="footer_bg" 
+                                value="{{ current_theme.footer_bg if current_theme else '#1F2937' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                        <div>
+                            <label for="footer_text" class="block text-sm font-medium text-gray-700 mb-2">Текст подвала</label>
+                            <input 
+                                type="color" 
+                                id="footer_text" 
+                                name="footer_text" 
+                                value="{{ current_theme.footer_text if current_theme else '#FFFFFF' }}"
+                                class="w-full h-10 rounded-lg cursor-pointer border border-gray-300"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="banner_url" class="block text-sm font-medium text-gray-700 mb-2">URL баннера</label>
+                        <input 
+                            type="url" 
+                            id="banner_url" 
+                            name="banner_url" 
+                            value="{{ current_theme.banner_url if current_theme else '/static/img/banner.jpg' }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="https://example.com/banner.jpg"
+                        >
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <button 
+                            type="submit" 
+                            class="bg-button text-buttonText px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition"
+                        >
+                            Сохранить тему
+                        </button>
+                        <button 
+                            type="reset" 
+                            class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition"
+                        >
+                            Сбросить
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Список сохраненных тем -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Сохраненные темы</h2>
+                
+                {% if themes %}
+                <div class="space-y-4">
+                    {% for t in themes %}
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-semibold text-gray-800">{{ t.name }}</h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-6 h-6 rounded-full border border-gray-300" style="background-color: {{ t.primary_color }}"></span>
+                                <span class="w-6 h-6 rounded-full border border-gray-300" style="background-color: {{ t.secondary_color }}"></span>
+                                <span class="w-6 h-6 rounded-full border border-gray-300" style="background-color: {{ t.header_bg }}"></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                <p>Кнопки: <span style="color: {{ t.button_bg }}">{{ t.button_bg }}</span></p>
+                                <p>Баннер: <span class="text-primary">{{ t.banner_url }}</span></p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <a 
+                                    href="/admin/themes/{{ t.id }}/apply" 
+                                    class="bg-secondary text-white px-3 py-1 rounded-lg text-sm hover:opacity-90 transition"
+                                >
+                                    Применить
+                                </a>
+                                <a 
+                                    href="/admin/themes/{{ t.id }}/edit" 
+                                    class="bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm hover:bg-gray-300 transition"
+                                >
+                                    Редактировать
+                                </a>
+                                <form action="/admin/themes/{{ t.id }}/delete" method="post" class="inline">
+                                    <button 
+                                        type="submit" 
+                                        class="bg-red-100 text-red-700 px-3 py-1 rounded-lg text-sm hover:bg-red-200 transition"
+                                        onclick="return confirm('Удалить эту тему?')"
+                                    >
+                                        Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center py-8">Нет сохраненных тем</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Предпросмотр темы -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Предпросмотр</h2>
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <div class="p-4" style="background-color: {{ current_theme.header_bg if current_theme else '#1F2937' }}">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold" style="color: {{ current_theme.header_text if current_theme else '#FFFFFF' }}">
+                            Портал Талакан
+                        </span>
+                        <div class="flex space-x-4">
+                            <span style="color: {{ current_theme.header_text if current_theme else '#FFFFFF' }}">Главная</span>
+                            <span style="color: {{ current_theme.header_text if current_theme else '#FFFFFF' }}">Новости</span>
+                            <span style="color: {{ current_theme.header_text if current_theme else '#FFFFFF' }}">Объявления</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex space-x-4 mb-4">
+                        <button class="px-4 py-2 rounded-lg font-semibold" style="background-color: {{ current_theme.button_bg if current_theme else '#3B82F6' }}; color: {{ current_theme.button_text if current_theme else '#FFFFFF' }}">
+                            Основная кнопка
+                        </button>
+                        <button class="px-4 py-2 rounded-lg font-semibold" style="background-color: {{ current_theme.secondary_color if current_theme else '#10B981' }}; color: #FFFFFF">
+                            Вторичная кнопка
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-gray-700">Пример текста для предпросмотра темы оформления. Здесь отображается основной контент страницы.</p>
+                    </div>
+                </div>
+                <div class="p-4" style="background-color: {{ current_theme.footer_bg if current_theme else '#1F2937' }}">
+                    <p class="text-center" style="color: {{ current_theme.footer_text if current_theme else '#FFFFFF' }}">
+                        © 2024 Портал поселка Талакан
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

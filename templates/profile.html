@@ -1,0 +1,200 @@
+<!-- templates/profile.html -->
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет - {{ theme.app_name or 'Портал поселка Талакан' }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex-grow">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Личный кабинет</h1>
+
+        {% if success_message %}
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            {{ success_message }}
+        </div>
+        {% endif %}
+
+        {% if error_message %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <!-- Информация о пользователе -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Мои данные</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-500">Имя пользователя</p>
+                    <p class="font-semibold text-gray-800">{{ user.username }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="font-semibold text-gray-800">{{ user.email }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-500">Телефон</p>
+                    <p class="font-semibold text-gray-800">{{ user.phone or 'Не указан' }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-500">Роль</p>
+                    <p class="font-semibold text-gray-800">
+                        {% if user.role == 'admin' %}
+                            <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs">Администратор</span>
+                        {% elif user.role == 'moderator' %}
+                            <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">Модератор</span>
+                        {% else %}
+                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">Пользователь</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-500">Дата регистрации</p>
+                    <p class="font-semibold text-gray-800">{{ user.created_at[:10] if user.created_at else 'Не указана' }}</p>
+                </div>
+            </div>
+
+            <!-- Форма обновления профиля -->
+            <form action="/profile/update" method="post" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Имя пользователя</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            value="{{ user.username }}"
+                            required
+                            minlength="3"
+                            maxlength="50"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        >
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            value="{{ user.email }}"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        >
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Телефон</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            value="{{ user.phone or '' }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="+7 (XXX) XXX-XX-XX"
+                        >
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Смена пароля</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="current_password" class="block text-sm font-medium text-gray-700 mb-1">Текущий пароль</label>
+                            <input 
+                                type="password" 
+                                id="current_password" 
+                                name="current_password" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Оставьте пустым, если не меняете"
+                            >
+                        </div>
+                        <div>
+                            <label for="new_password" class="block text-sm font-medium text-gray-700 mb-1">Новый пароль</label>
+                            <input 
+                                type="password" 
+                                id="new_password" 
+                                name="new_password" 
+                                minlength="6"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Минимум 6 символов"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-button text-buttonText px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Мои посты -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Мои публикации</h2>
+                <div class="flex space-x-2">
+                    <a href="/news/create" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
+                        + Новость
+                    </a>
+                    <a href="/board/create" class="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
+                        + Объявление
+                    </a>
+                </div>
+            </div>
+
+            {% if user_posts %}
+            <div class="space-y-4">
+                {% for post in user_posts %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            {% if post.category == 'news' %}
+                            <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">Новость</span>
+                            {% else %}
+                            <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-medium">Объявление</span>
+                            {% endif %}
+                            <span class="text-sm text-gray-500">{{ post.created_at[:10] }}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            {% if not post.is_published %}
+                            <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">Черновик</span>
+                            {% endif %}
+                            <a href="/{{ post.category }}/{{ post.id }}" class="text-primary hover:underline text-sm">Просмотр</a>
+                            <a href="/{{ post.category }}/{{ post.id }}/edit" class="text-gray-500 hover:text-primary transition text-sm">Редактировать</a>
+                            <form action="/{{ post.category }}/{{ post.id }}/delete" method="post" class="inline" onsubmit="return confirm('Удалить эту публикацию?')">
+                                <button type="submit" class="text-red-500 hover:text-red-700 transition text-sm">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-1">{{ post.title }}</h3>
+                    <p class="text-gray-600 text-sm line-clamp-2">{{ post.content[:150] }}{% if post.content|length > 150 %}...{% endif %}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500 mb-4">У вас пока нет публикаций</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="/news/create" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
+                        Создать новость
+                    </a>
+                    <a href="/board/create" class="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
+                        Подать объявление
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Действия -->
+        <div class="mt-8 flex justify-end">
+            <form action="/auth/logout" method="post">
+                <button type="submit" class="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-600 transition">
+                    Выйти из аккаунта
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

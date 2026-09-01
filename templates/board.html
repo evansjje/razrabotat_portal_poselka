@@ -1,0 +1,91 @@
+<!-- templates/board.html -->
+{% extends "base.html" %}
+
+{% block title %}Доска объявлений - {{ theme.app_name or 'Портал поселка Талакан' }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex-grow">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Доска объявлений</h1>
+        {% if user %}
+        <a href="/board/create" class="bg-button text-buttonText px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">
+            + Подать объявление
+        </a>
+        {% endif %}
+    </div>
+
+    {% if board_posts %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for post in board_posts %}
+        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center text-sm text-gray-500 mb-3">
+                    <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-medium">Объявление</span>
+                    <span class="ml-3">{{ post.created_at[:10] }}</span>
+                    <span class="ml-3">Автор: {{ post.author_name }}</span>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">
+                    <a href="/board/{{ post.id }}" class="hover:text-primary transition">{{ post.title }}</a>
+                </h2>
+                <p class="text-gray-600 line-clamp-3 mb-4">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                <div class="flex items-center justify-between">
+                    <a href="/board/{{ post.id }}" class="text-primary hover:underline font-medium">Подробнее →</a>
+                    {% if user and (user.role in ['admin', 'moderator'] or user.id == post.author_id) %}
+                    <div class="flex space-x-2">
+                        <a href="/board/{{ post.id }}/edit" class="text-gray-500 hover:text-primary transition" title="Редактировать">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </a>
+                        <form action="/board/{{ post.id }}/delete" method="post" class="inline" onsubmit="return confirm('Удалить объявление?')">
+                            <button type="submit" class="text-gray-500 hover:text-red-500 transition" title="Удалить">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if total_pages > 1 %}
+    <div class="flex justify-center mt-8 space-x-2">
+        {% if page > 1 %}
+        <a href="/board?page={{ page - 1 }}" class="px-4 py-2 bg-white rounded-lg shadow hover:bg-gray-50 transition">← Назад</a>
+        {% endif %}
+        
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+            <span class="px-4 py-2 bg-primary text-buttonText rounded-lg shadow">{{ p }}</span>
+            {% elif p >= page - 2 and p <= page + 2 %}
+            <a href="/board?page={{ p }}" class="px-4 py-2 bg-white rounded-lg shadow hover:bg-gray-50 transition">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page < total_pages %}
+        <a href="/board?page={{ page + 1 }}" class="px-4 py-2 bg-white rounded-lg shadow hover:bg-gray-50 transition">Вперед →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-500 text-lg mb-4">Объявлений пока нет</p>
+        {% if user %}
+        <a href="/board/create" class="bg-button text-buttonText px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition">
+            Создать первое объявление
+        </a>
+        {% else %}
+        <a href="/auth/login" class="bg-button text-buttonText px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition">
+            Войдите, чтобы подать объявление
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

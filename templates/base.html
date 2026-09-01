@@ -1,0 +1,162 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ theme.app_name or 'Портал поселка Талакан' }}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '{{ theme.primary_color or "#3B82F6" }}',
+                        secondary: '{{ theme.secondary_color or "#10B981" }}',
+                        header: '{{ theme.header_bg or "#1F2937" }}',
+                        headerText: '{{ theme.header_text or "#FFFFFF" }}',
+                        button: '{{ theme.button_bg or "#3B82F6" }}',
+                        buttonText: '{{ theme.button_text or "#FFFFFF" }}',
+                        footer: '{{ theme.footer_bg or "#1F2937" }}',
+                        footerText: '{{ theme.footer_text or "#FFFFFF" }}',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .banner-bg {
+            background-image: url('{{ theme.banner_url or "/static/img/banner.jpg" }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50">
+    <!-- Шапка -->
+    <header class="bg-header text-headerText shadow-lg">
+        <nav class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-2xl font-bold hover:opacity-80 transition-opacity">
+                        🏘️ {{ theme.app_name or 'Портал Талакан' }}
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="hover:opacity-80 {% if current_page == 'main' %}font-bold border-b-2 border-button{% endif %}">
+                        Главная
+                    </a>
+                    <a href="/news" class="hover:opacity-80 {% if current_page == 'news' %}font-bold border-b-2 border-button{% endif %}">
+                        Новости
+                    </a>
+                    <a href="/board" class="hover:opacity-80 {% if current_page == 'board' %}font-bold border-b-2 border-button{% endif %}">
+                        Доска объявлений
+                    </a>
+                    <a href="/weather" class="hover:opacity-80 {% if current_page == 'weather' %}font-bold border-b-2 border-button{% endif %}">
+                        Погода
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    {% if user %}
+                        <div class="flex items-center space-x-3">
+                            <a href="/profile" class="flex items-center space-x-2 hover:opacity-80">
+                                <div class="w-8 h-8 rounded-full bg-button text-buttonText flex items-center justify-center font-bold">
+                                    {{ user.username[0]|upper if user.username else 'U' }}
+                                </div>
+                                <span>{{ user.username }}</span>
+                            </a>
+                            {% if user.role == 'admin' %}
+                                <a href="/admin" class="px-3 py-1 rounded bg-button text-buttonText hover:opacity-80 text-sm">
+                                    Админка
+                                </a>
+                            {% endif %}
+                            <form method="post" action="/auth/logout" class="inline">
+                                <button type="submit" class="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 text-sm">
+                                    Выйти
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="flex items-center space-x-3">
+                            <a href="/auth/login" class="px-4 py-2 rounded bg-button text-buttonText hover:opacity-80">
+                                Войти
+                            </a>
+                            <a href="/auth/register" class="px-4 py-2 rounded border-2 border-button text-buttonText hover:bg-button hover:text-buttonText transition-colors">
+                                Регистрация
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Баннер -->
+    {% if current_page == 'main' %}
+    <div class="banner-bg h-64 md:h-80 relative">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+            <div class="text-center text-white">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ theme.banner_title or 'Добро пожаловать в Талакан!' }}</h1>
+                <p class="text-xl">{{ theme.banner_subtitle or 'Портал жителей поселка и работников Бурейской ГЭС' }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Основной контент -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Подвал -->
+    <footer class="bg-footer text-footerText mt-auto">
+        <div class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-3">О портале</h3>
+                    <p class="text-sm opacity-80">
+                        Информационный портал поселка Талакан.
+                        Новости Бурейской ГЭС, объявления, погода.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-3">Разделы</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/news" class="hover:opacity-80">Новости</a></li>
+                        <li><a href="/board" class="hover:opacity-80">Доска объявлений</a></li>
+                        <li><a href="/weather" class="hover:opacity-80">Погода</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-3">Контакты</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>📍 Амурская область, Бурейский район</li>
+                        <li>📧 info@talakan.ru</li>
+                        <li>📞 +7 (416) 123-45-67</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-opacity-20 text-center text-sm opacity-60">
+                © 2024 Портал поселка Талакан. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
